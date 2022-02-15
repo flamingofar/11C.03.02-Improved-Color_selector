@@ -2,10 +2,10 @@
 ("use strict;");
 
 const colorPicker = document.querySelector("#color");
-const body = document.querySelector("body");
 const hexV = document.querySelector(".hex");
 const rgbV = document.querySelector(".rgb");
 const hslV = document.querySelector(".hsl");
+const cssV = document.querySelector(".css");
 
 window.addEventListener("DOMContentLoaded", setup);
 // Setup
@@ -13,10 +13,12 @@ function setup() {
 	hexV.textContent = colorPicker.value;
 	rgbV.textContent = "rgb: 255, 255, 255";
 	hslV.textContent = "hsl: 0, 0, 100";
+	cssV.textContent = "rgb(0, 0, 0)";
 	getColors();
 }
 
-// Get HEX color value and show
+//************************ MODEL ************************
+// Get HEX color values
 function getColors() {
 	let hexColorValue, rgbColorValue;
 	colorPicker.addEventListener("input", (e) => {
@@ -26,16 +28,56 @@ function getColors() {
 		hexColorValue = `${colorPickValue}`;
 		//RGB Value
 		rgbColorValue = hexToRgb(hexColorValue);
+		//CSS Value
+		cssColorValue = rgbToCss(rgbColorValue);
 		//HSL Value
 		hslColorValue = rgbToHsl(rgbColorValue.r, rgbColorValue.g, rgbColorValue.b);
 
-		// Show Values
-		hexV.textContent = hexColorValue;
-		rgbV.textContent = `rgb: ${rgbColorValue.r}, ${rgbColorValue.g},${rgbColorValue.b}`;
-		hslV.textContent = `hsl: ${hslColorValue.h}, ${hslColorValue.s}, ${hslColorValue.l}`;
-		//Set body background color
-		body.style.backgroundColor = hexColorValue;
+		displayColors(hexColorValue, rgbColorValue, cssColorValue, hslColorValue);
 	});
+}
+
+//************************ VIEW ************************
+function displayColors(hex, rgb, css, hsl) {
+	// Show Values
+	displayHex(hex);
+	displayRgb(rgb);
+	displayHsl(hsl);
+	displayCss(css);
+
+	//Set body background color
+	const body = document.querySelector("body");
+	body.style.backgroundColor = hex;
+}
+
+//************************ Controllor ************************
+
+/*
+ * Display HEX
+ */
+function displayHex(hex) {
+	hexV.textContent = hex;
+}
+
+/*
+ * Display RGB
+ */
+function displayRgb(rgb) {
+	rgbV.textContent = `rgb: ${rgb.r}, ${rgb.g},${rgb.b}`;
+}
+
+/*
+ * DISPLAY HSL
+ */
+function displayHsl(hsl) {
+	hslV.textContent = `hsl: ${hsl.h}, ${hsl.s}, ${hsl.l}`;
+}
+
+/*
+ * Display CSS
+ */
+function displayCss(css) {
+	cssV.textContent = `css: rgb(${css.r}, ${css.g}, ${css.b})`;
 }
 
 /*
@@ -57,7 +99,7 @@ function rgbToHex(rgbObject) {
 	r = convertion(rgbObject.r);
 	g = convertion(rgbObject.g);
 	b = convertion(rgbObject.b);
-	rgbToHsl(rgbObject.r, rgbObject.g, rgbObject.b);
+	// rgbToHsl(rgbObject.r, rgbObject.g, rgbObject.b);
 	return `#${r}${g}${b}`;
 }
 function convertion(color) {
@@ -68,15 +110,12 @@ function convertion(color) {
 /*
  *CSS to RGB
  */
-function cssToRGB(css) {
+function rgbToCss(rgb) {
 	let r, g, b;
-	const rawTxt = css
-		.substring(css.indexOf("(") + 1, css.indexOf(")"))
-		.trim()
-		.split(", ");
-	r = parseInt(rawTxt[0].trim());
-	g = parseInt(rawTxt[1].trim());
-	b = parseInt(rawTxt[2].trim());
+	r = rgb.r;
+	g = rgb.g;
+	b = rgb.b;
+	return { r, g, b };
 	// console.log(`RGB Values are: r:${r}, g:${g}, b:${b}`);
 }
 
@@ -117,8 +156,6 @@ function rgbToHsl(r, g, b) {
 	// multiply s and l by 100 to get the value in percent, rather than [0,1]
 	s *= 100;
 	l *= 100;
-
-	// console.log("hsl(%f,%f%,%f%)", h, s, l); // just for testing
 
 	return { h: Math.floor(h), s: Math.floor(s), l: Math.floor(l) };
 }

@@ -19,7 +19,6 @@ section {
 
 .colorpicker {
 	display: flex;
-	height: 5rem;
 	background: rgb(244, 244, 244);
 	border-radius: 4px;
 
